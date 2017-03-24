@@ -2,7 +2,7 @@
 This source file is part of KBEngine
 For the latest info, see http://www.kbengine.org/
 
-Copyright (c) 2008-2016 KBEngine.
+Copyright (c) 2008-2017 KBEngine.
 
 KBEngine is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -110,6 +110,13 @@ NETWORK_INTERFACE_DECLARE_BEGIN(CellappmgrInterface)
 
 	// 查询所有相关进程space信息
 	CELLAPPMGR_MESSAGE_DECLARE_STREAM(querySpaces,				NETWORK_VARIABLE_MESSAGE)
+
+	// 更新相关进程space信息，注意：此spaceData并非API文档中描述的spaceData
+	// 是指space的一些信息
+	CELLAPPMGR_MESSAGE_DECLARE_STREAM(updateSpaceData,			NETWORK_VARIABLE_MESSAGE)
+
+	// 工具请求改变space查看器（含添加和删除功能）
+	CELLAPPMGR_MESSAGE_DECLARE_STREAM(setSpaceViewer,			NETWORK_VARIABLE_MESSAGE)
 
 NETWORK_INTERFACE_DECLARE_END()
 

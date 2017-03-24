@@ -2,7 +2,7 @@
 This source file is part of KBEngine
 For the latest info, see http://www.kbengine.org/
 
-Copyright (c) 2008-2016 KBEngine.
+Copyright (c) 2008-2017 KBEngine.
 
 KBEngine is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -104,7 +104,6 @@ PyObject* createCellDataDictFromPersistentStream(MemoryStream& s, const char* en
 
 		if (pScriptModule->hasCell())
 		{
-			ArraySize size = 0;
 #ifdef CLIENT_NO_FLOAT
 			int32 v1, v2, v3;
 			int32 vv1, vv2, vv3;
@@ -113,8 +112,8 @@ PyObject* createCellDataDictFromPersistentStream(MemoryStream& s, const char* en
 			float vv1, vv2, vv3;
 #endif
 
-			s >> size >> v1 >> v2 >> v3;
-			s >> size >> vv1 >> vv2 >> vv3;
+			s >> v1 >> v2 >> v3;
+			s >> vv1 >> vv2 >> vv3;
 
 			PyObject* position = PyTuple_New(3);
 			PyTuple_SET_ITEM(position, 0, PyFloat_FromDouble((float)v1));
@@ -619,6 +618,9 @@ void Baseapp::onCellAppDeath(Network::Channel * pChannel)
 //-------------------------------------------------------------------------------------
 void Baseapp::onRequestRestoreCB(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	COMPONENT_ID cid, source_cid;
 	bool canRestore = true;
 
@@ -655,6 +657,9 @@ void Baseapp::onRestoreEntitiesOver(RestoreEntityHandler* pRestoreEntityHandler)
 //-------------------------------------------------------------------------------------
 void Baseapp::onRestoreSpaceCellFromOtherBaseapp(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	COMPONENT_ID baseappID = 0, cellappID = 0;
 	SPACE_ID spaceID = 0;
 	ENTITY_ID spaceEntityID = 0;
@@ -948,7 +953,7 @@ PyObject* Baseapp::__py_createBaseFromDBID(PyObject* self, PyObject* args)
 	wchar_t* wEntityType = NULL;
 	char* entityType = NULL;
 	int ret = -1;
-	DBID dbid;
+	DBID dbid = 0;
 	PyObject* pyEntityType = NULL;
 	PyObject* pyDBInterfaceName = NULL;
 	std::string dbInterfaceName = "default";
@@ -1126,6 +1131,9 @@ void Baseapp::createBaseFromDBID(const char* entityType, DBID dbid, PyObject* py
 //-------------------------------------------------------------------------------------
 void Baseapp::onCreateBaseFromDBIDCallback(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	std::string entityType;
 	DBID dbid;
 	CALLBACK_ID callbackID;
@@ -1292,7 +1300,7 @@ PyObject* Baseapp::__py_createBaseAnywhereFromDBID(PyObject* self, PyObject* arg
 	wchar_t* wEntityType = NULL;
 	char* entityType = NULL;
 	int ret = -1;
-	DBID dbid;
+	DBID dbid = 0;
 	PyObject* pyEntityType = NULL;
 	PyObject* pyDBInterfaceName = NULL;
 	std::string dbInterfaceName = "default";
@@ -1467,6 +1475,9 @@ void Baseapp::createBaseAnywhereFromDBID(const char* entityType, DBID dbid, PyOb
 //-------------------------------------------------------------------------------------
 void Baseapp::onGetCreateBaseAnywhereFromDBIDBestBaseappID(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	COMPONENT_ID targetComponentID;
 	s >> targetComponentID;
 
@@ -1515,6 +1526,9 @@ void Baseapp::onGetCreateBaseAnywhereFromDBIDBestBaseappID(Network::Channel* pCh
 //-------------------------------------------------------------------------------------
 void Baseapp::onCreateBaseAnywhereFromDBIDCallback(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	size_t currpos = s.rpos();
 
 	std::string entityType;
@@ -1649,6 +1663,9 @@ void Baseapp::onCreateBaseAnywhereFromDBIDCallback(Network::Channel* pChannel, K
 //-------------------------------------------------------------------------------------
 void Baseapp::createBaseAnywhereFromDBIDOtherBaseapp(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	std::string entityType;
 	DBID dbid;
 	CALLBACK_ID callbackID;
@@ -1737,6 +1754,9 @@ void Baseapp::createBaseAnywhereFromDBIDOtherBaseapp(Network::Channel* pChannel,
 void Baseapp::onCreateBaseAnywhereFromDBIDOtherBaseappCallback(Network::Channel* pChannel, COMPONENT_ID createByBaseappID, 
 															   std::string entityType, ENTITY_ID createdEntityID, CALLBACK_ID callbackID, DBID dbid)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	if(callbackID > 0)
 	{
 		ScriptDefModule* sm = EntityDef::findScriptModule(entityType.c_str());
@@ -1802,7 +1822,7 @@ PyObject* Baseapp::__py_createBaseRemotelyFromDBID(PyObject* self, PyObject* arg
 	wchar_t* wEntityType = NULL;
 	char* entityType = NULL;
 	int ret = -1;
-	DBID dbid;
+	DBID dbid = 0;
 	PyObject* pyEntityType = NULL;
 	PyObject* pyDBInterfaceName = NULL;
 	std::string dbInterfaceName = "default";
@@ -1998,6 +2018,9 @@ void Baseapp::createBaseRemotelyFromDBID(const char* entityType, DBID dbid, COMP
 //-------------------------------------------------------------------------------------
 void Baseapp::onCreateBaseRemotelyFromDBIDCallback(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	size_t currpos = s.rpos();
 
 	std::string entityType;
@@ -2132,6 +2155,9 @@ void Baseapp::onCreateBaseRemotelyFromDBIDCallback(Network::Channel* pChannel, K
 //-------------------------------------------------------------------------------------
 void Baseapp::createBaseRemotelyFromDBIDOtherBaseapp(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	std::string entityType;
 	DBID dbid;
 	CALLBACK_ID callbackID;
@@ -2220,6 +2246,9 @@ void Baseapp::createBaseRemotelyFromDBIDOtherBaseapp(Network::Channel* pChannel,
 void Baseapp::onCreateBaseRemotelyFromDBIDOtherBaseappCallback(Network::Channel* pChannel, COMPONENT_ID createByBaseappID, 
 															   std::string entityType, ENTITY_ID createdEntityID, CALLBACK_ID callbackID, DBID dbid)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	if(callbackID > 0)
 	{
 		ScriptDefModule* sm = EntityDef::findScriptModule(entityType.c_str());
@@ -2948,13 +2977,17 @@ void Baseapp::onEntityGetCell(Network::Channel* pChannel, ENTITY_ID id,
 //-------------------------------------------------------------------------------------
 void Baseapp::onClientEntityEnterWorld(Proxy* base, COMPONENT_ID componentID)
 {
+	Py_INCREF(base);
 	base->initClientCellPropertys();
 	base->onClientGetCell(NULL, componentID);
+	Py_DECREF(base);
 }
 
 //-------------------------------------------------------------------------------------
 bool Baseapp::createClientProxies(Proxy* base, bool reload)
 {
+	Py_INCREF(base);
+	
 	// 将通道代理的关系与该entity绑定， 在后面通信中可提供身份合法性识别
 	Network::Channel* pChannel = base->clientMailbox()->getChannel();
 	pChannel->proxyID(base->id());
@@ -2963,7 +2996,7 @@ bool Baseapp::createClientProxies(Proxy* base, bool reload)
 	// 重新生成一个ID
 	if(reload)
 		base->rndUUID(genUUID64());
-
+	
 	// 一些数据必须在实体创建后立即访问
 	base->initClientBasePropertys();
 
@@ -2979,7 +3012,7 @@ bool Baseapp::createClientProxies(Proxy* base, bool reload)
 	// 本应该由客户端告知已经创建好entity后调用这个接口。
 	//if(!reload)
 	base->onEntitiesEnabled();
-
+	Py_DECREF(base);
 	return true;
 }
 
@@ -3082,6 +3115,9 @@ void Baseapp::executeRawDatabaseCommand(const char* datas, uint32 size, PyObject
 //-------------------------------------------------------------------------------------
 void Baseapp::onExecuteRawDatabaseCommandCB(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	std::string err;
 	CALLBACK_ID callbackID = 0;
 	uint32 nrows = 0;
@@ -3205,7 +3241,7 @@ PyObject* Baseapp::__py_charge(PyObject* self, PyObject* args)
 
 	PyObject* pyDatas = NULL, *pycallback = NULL;
 	char* pChargeID = NULL;
-	DBID dbid;
+	DBID dbid = 0;
 
 	if(PyArg_ParseTuple(args, "s|K|O|O", &pChargeID, &dbid, &pyDatas, &pycallback) == -1)
 	{
@@ -3310,6 +3346,9 @@ void Baseapp::charge(std::string chargeID, DBID dbid, const std::string& datas, 
 //-------------------------------------------------------------------------------------
 void Baseapp::onChargeCB(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	std::string chargeID;
 	CALLBACK_ID callbackID;
 	std::string datas;
@@ -3544,7 +3583,7 @@ void Baseapp::loginBaseappFailed(Network::Channel* pChannel, std::string& accoun
 	Network::Bundle* pBundle = Network::Bundle::createPoolObject();
 
 	if(relogin)
-		(*pBundle).newMessage(ClientInterface::onReLoginBaseappFailed);
+		(*pBundle).newMessage(ClientInterface::onReloginBaseappFailed);
 	else
 		(*pBundle).newMessage(ClientInterface::onLoginBaseappFailed);
 
@@ -3586,6 +3625,11 @@ void Baseapp::loginBaseapp(Network::Channel* pChannel,
 
 	PendingLoginMgr::PLInfos* ptinfos = pendingLoginMgr_.find(accountName);
 	if(ptinfos == NULL)
+	{
+		loginBaseappFailed(pChannel, accountName, SERVER_ERR_ILLEGAL_LOGIN);
+		return;
+	}
+	else if (!ptinfos->addr.isNone() && ptinfos->addr != pChannel->addr())
 	{
 		loginBaseappFailed(pChannel, accountName, SERVER_ERR_ILLEGAL_LOGIN);
 		return;
@@ -3637,9 +3681,20 @@ void Baseapp::loginBaseapp(Network::Channel* pChannel,
 		
 		pendingLoginMgr_.removeNextTick(accountName);
 
+		// 防止在onLogOnAttempt中销毁了
+		Py_INCREF(base);
+
 		// 通知脚本异常登录请求有脚本决定是否允许这个通道强制登录
 		int32 ret = base->onLogOnAttempt(pChannel->addr().ipAsString(), 
 			ntohs(pChannel->addr().port), password.c_str());
+
+		if (base->isDestroyed())
+		{
+			Py_DECREF(base);
+
+			loginBaseappFailed(pChannel, accountName, SERVER_ERR_OP_FAILED);
+			return;
+		}
 
 		switch(ret)
 		{
@@ -3665,6 +3720,7 @@ void Baseapp::loginBaseapp(Network::Channel* pChannel,
 				base->setClientType(ptinfos->ctype);
 				base->setClientDatas(ptinfos->datas);
 				createClientProxies(base, true);
+				base->onGetWitness();
 			}
 			else
 			{
@@ -3680,14 +3736,18 @@ void Baseapp::loginBaseapp(Network::Channel* pChannel,
 				// 将通道代理的关系与该entity绑定， 在后面通信中可提供身份合法性识别
 				entityClientMailbox->getChannel()->proxyID(base->id());
 				createClientProxies(base, true);
+				base->onGetWitness();
 			}
 			break;
 		case LOG_ON_WAIT_FOR_DESTROY:
 		default:
 			INFO_MSG("Baseapp::loginBaseapp: script LOG_ON_REJECT.\n");
 			loginBaseappFailed(pChannel, accountName, SERVER_ERR_ACCOUNT_IS_ONLINE);
+			Py_DECREF(base);
 			return;
 		};
+
+		Py_DECREF(base);
 	}
 	else
 	{
@@ -3708,11 +3768,11 @@ void Baseapp::loginBaseapp(Network::Channel* pChannel,
 }
 
 //-------------------------------------------------------------------------------------
-void Baseapp::reLoginBaseapp(Network::Channel* pChannel, std::string& accountName, 
+void Baseapp::reloginBaseapp(Network::Channel* pChannel, std::string& accountName, 
 							 std::string& password, uint64 key, ENTITY_ID entityID)
 {
 	accountName = KBEngine::strutil::kbe_trim(accountName);
-	INFO_MSG(fmt::format("Baseapp::reLoginBaseapp: accountName={}, key={}, entityID={}.\n",
+	INFO_MSG(fmt::format("Baseapp::reloginBaseapp: accountName={}, key={}, entityID={}.\n",
 		accountName, key, entityID));
 
 	Base* base = findEntity(entityID);
@@ -3735,7 +3795,7 @@ void Baseapp::reLoginBaseapp(Network::Channel* pChannel, std::string& accountNam
 	{
 		Network::Channel* pMBChannel = entityClientMailbox->getChannel();
 
-		WARNING_MSG(fmt::format("Baseapp::reLoginBaseapp: accountName={}, key={}, "
+		WARNING_MSG(fmt::format("Baseapp::reloginBaseapp: accountName={}, key={}, "
 			"entityID={}, ClientMailbox({}) is exist, will be kicked out!\n",
 			accountName, key, entityID, 
 			(pMBChannel ? pMBChannel->c_str() : "unknown")));
@@ -3765,16 +3825,16 @@ void Baseapp::reLoginBaseapp(Network::Channel* pChannel, std::string& accountNam
 	// 客户端重连也需要将完整的数据重发给客户端， 相当于登录之后获得的数据。
 	// 因为断线期间不能确保包括场景等数据已发生变化
 	// 客户端需要重建所有数据
+	Py_INCREF(proxy);
 	createClientProxies(proxy, true);
 	proxy->onGetWitness();
+	Py_DECREF(proxy);
 	// proxy->onEntitiesEnabled();
 
-	/*
 	Network::Bundle* pBundle = Network::Bundle::createPoolObject();
-	(*pBundle).newMessage(ClientInterface::onReLoginBaseappSuccessfully);
+	(*pBundle).newMessage(ClientInterface::onReloginBaseappSuccessfully);
 	(*pBundle) << proxy->rndUUID();
 	pChannel->send(pBundle);
-	*/
 }
 
 //-------------------------------------------------------------------------------------
@@ -3848,6 +3908,8 @@ void Baseapp::onQueryAccountCBFromDbmgr(Network::Channel* pChannel, KBEngine::Me
 		s.done();
 		
 		loginBaseappFailed(pClientChannel, accountName, SERVER_ERR_SRV_NO_READY);
+		
+		this->destroyEntity(base->id(), true);
 		return;
 	}
 	
@@ -3867,6 +3929,7 @@ void Baseapp::onQueryAccountCBFromDbmgr(Network::Channel* pChannel, KBEngine::Me
 	PyDict_SetItemString(pyDict, "__ACCOUNT_PASSWORD__", py__ACCOUNT_PASSWD__);
 	Py_DECREF(py__ACCOUNT_PASSWD__);
 
+	Py_INCREF(base);
 	base->initializeEntity(pyDict);
 	Py_DECREF(pyDict);
 
@@ -3896,6 +3959,7 @@ void Baseapp::onQueryAccountCBFromDbmgr(Network::Channel* pChannel, KBEngine::Me
 		accountName, base->rndUUID(), base->id(), flags, deadline));
 
 	SAFE_RELEASE(ptinfos);
+	Py_DECREF(base);
 }
 
 //-------------------------------------------------------------------------------------
@@ -4168,7 +4232,7 @@ void Baseapp::onEntityMail(Network::Channel* pChannel, KBEngine::MemoryStream& s
 	Base* base = pEntities_->find(eid);
 	if(base == NULL)
 	{
-		ERROR_MSG(fmt::format("Baseapp::onEntityMail: entityID {} not found.\n", eid));
+		WARNING_MSG(fmt::format("Baseapp::onEntityMail: entityID {} not found.\n", eid));
 		s.done();
 		return;
 	}
@@ -4265,7 +4329,7 @@ void Baseapp::onRemoteCallCellMethodFromClient(Network::Channel* pChannel, KBEng
 
 	if(e == NULL || e->cellMailbox() == NULL)
 	{
-		ERROR_MSG(fmt::format("Baseapp::onRemoteCallCellMethodFromClient: {} {} no cell.\n",
+		WARNING_MSG(fmt::format("Baseapp::onRemoteCallCellMethodFromClient: {} {} no cell.\n",
 			(e == NULL ? "unknown" : e->scriptName()), srcEntityID));
 		
 		s.done();
@@ -4816,7 +4880,7 @@ PyObject* Baseapp::__py_deleteBaseByDBID(PyObject* self, PyObject* args)
 	char* entityType = NULL;
 	PyObject* pycallback = NULL;
 	PyObject* pyDBInterfaceName = NULL;
-	DBID dbid;
+	DBID dbid = 0;
 	std::string dbInterfaceName = "default";
 
 	if (currargsSize == 3)
@@ -4908,6 +4972,9 @@ PyObject* Baseapp::__py_deleteBaseByDBID(PyObject* self, PyObject* args)
 //-------------------------------------------------------------------------------------
 void Baseapp::deleteBaseByDBIDCB(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	ENTITY_ID entityID = 0;
 	COMPONENT_ID entityInAppID = 0;
 	bool success = false;
@@ -4988,7 +5055,7 @@ PyObject* Baseapp::__py_lookUpBaseByDBID(PyObject* self, PyObject* args)
 	
 	char* entityType = NULL;
 	PyObject* pycallback = NULL;
-	DBID dbid;
+	DBID dbid = 0;
 	std::string dbInterfaceName = "default";
 
 	if (currargsSize == 3)
@@ -5086,6 +5153,9 @@ PyObject* Baseapp::__py_lookUpBaseByDBID(PyObject* self, PyObject* args)
 //-------------------------------------------------------------------------------------
 void Baseapp::lookUpBaseByDBIDCB(Network::Channel* pChannel, KBEngine::MemoryStream& s)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	ENTITY_ID entityID = 0;
 	COMPONENT_ID entityInAppID = 0;
 	bool success = false;
@@ -5215,6 +5285,9 @@ void Baseapp::reqAccountBindEmail(Network::Channel* pChannel, ENTITY_ID entityID
 void Baseapp::onReqAccountBindEmailCB(Network::Channel* pChannel, ENTITY_ID entityID, std::string& accountName, std::string& email,
 	SERVER_ERROR_CODE failedcode, std::string& code)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	INFO_MSG(fmt::format("Baseapp::onReqAccountBindEmailCB: {}({}) failedcode={}!\n", 
 		accountName, entityID, failedcode));
 
@@ -5316,6 +5389,9 @@ void Baseapp::reqAccountNewPassword(Network::Channel* pChannel, ENTITY_ID entity
 void Baseapp::onReqAccountNewPasswordCB(Network::Channel* pChannel, ENTITY_ID entityID, std::string& accountName,
 	SERVER_ERROR_CODE failedcode)
 {
+	if(pChannel->isExternal())
+		return;
+	
 	INFO_MSG(fmt::format("Baseapp::onReqAccountNewPasswordCB: {}({}) failedcode={}!\n", 
 		accountName, entityID, failedcode));
 

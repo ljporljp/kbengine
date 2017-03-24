@@ -2,7 +2,7 @@
 This source file is part of KBEngine
 For the latest info, see http://www.kbengine.org/
 
-Copyright (c) 2008-2016 KBEngine.
+Copyright (c) 2008-2017 KBEngine.
 
 KBEngine is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
@@ -68,6 +68,12 @@ public:
 	INLINE DBID dbid() const;
 	INLINE void dbid(uint16 dbInterfaceIndex, DBID id);
 	DECLARE_PY_GET_MOTHOD(pyGetDBID);
+
+	/**
+	数据库关联名称
+	*/
+	INLINE uint16 dbInterfaceIndex() const;
+	DECLARE_PY_GET_MOTHOD(pyGetDBInterfaceName);
 
 	/** 
 		销毁cell部分的实体 
@@ -281,8 +287,6 @@ public:
 	INLINE void setDirty(bool dirty = true);
 	INLINE bool isDirty() const;
 	
-	INLINE uint16 dbInterfaceIndex() const;
-
 protected:
 	/** 
 		定义属性数据被改变了 
@@ -329,13 +333,13 @@ protected:
 	bool									inRestore_;
 
 	// 在一些状态下(传送过程中)，发往cellapp的数据包需要被缓存, 合适的状态需要继续转发
-	BaseMessagesForwardCellappHandler*	pBufferedSendToCellappMessages_;
+	BaseMessagesForwardCellappHandler*		pBufferedSendToCellappMessages_;
 	
 	// 如果此时实体还没有被设置为ENTITY_FLAGS_TELEPORT_START,  说明onMigrationCellappArrived包优先于
 	// onMigrationCellappStart到达(某些压力所致的情况下会导致实体跨进程跳转时（由cell1跳转到cell2），
 	// 跳转前所产生的包会比cell2的enterSpace包慢到达)，因此发生这种情况时需要将cell2的包先缓存
 	// 等cell1的包到达后执行完毕再执行cell2的包
-	BaseMessagesForwardClientHandler*	pBufferedSendToClientMessages_;
+	BaseMessagesForwardClientHandler*		pBufferedSendToClientMessages_;
 	
 	// 需要持久化的数据是否变脏，如果没有变脏不需要持久化
 	bool									isDirty_;
